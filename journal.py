@@ -8,6 +8,28 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
 
+Base = declarative_base()
+
+
+class Entry(Base):
+    __tablename__ = 'entries'
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    title = sa.Column(sa.Unicode(127), nullable=False)
+    text = sa.Column(sa.UnicodeText, nullable=False)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
+
+DATABASE_URL = os.environ.get(
+    'DATABASE_URL',
+    'postgresql://karenwong@localhost:5432/learning-journal'
+)
+
+
+def init_db():
+    engine = sa.create_engine(DATABASE_URL)
+    Base.metadata.create_all(engine)
+
 
 @view_config(route_name='home', renderer='string')
 def home(request):
@@ -28,19 +50,6 @@ def main():
     config.scan()
     app = config.make_wsgi_app()
     return app
-
-
-Base = declarative_base()
-
-
-class Entry(Base):
-    __tablename__ = 'entries'
-    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    title = sa.Column(sa.Unicode(127), nullable=False)
-    text = sa.Column(sa.UnicodeText, nullable=False)
-    created = sa.Column(
-        sa.DateTime, nullable=False, default=datetime.datetime.utcnow
-    )
 
 
 if __name__ == '__main__':
