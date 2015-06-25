@@ -17,8 +17,8 @@ import journal
 
 @pytest.fixture(scope='session')
 def connection(request):
-    engine = create_engine(TEST_DATABASE_URL)
-    journal.Base.metadata.create_all(engine)
+    engine = create_engine(TEST_DATABASE_URL)  # create database
+    journal.Base.metadata.create_all(engine)  # open connect
     connection = engine.connect()
     journal.DBSession.registry.clear()
     journal.DBSession.configure(bind=connection)
@@ -30,7 +30,7 @@ def connection(request):
 @pytest.fixture()
 def db_session(request, connection):
     from transaction import abort
-    trans = connection.begin()
+    trans = connection.begin()  # create sub transaction
     request.addfinalizer(trans.rollback)
     request.addfinalizer(abort)
 
@@ -51,7 +51,7 @@ def test_write_entry(db_session):
     auto_fields = ['id', 'timestamp']
     for field in auto_fields:
         assert getattr(entry, field, None) is None
-
+    # flush the session to "write" the data tho the database
     db_session.flush()
     # now, we should have one entry:
     assert db_session.query(journal.Entry).count() == 1
@@ -68,6 +68,7 @@ def test_entry_no_title_fails(db_session):
     journal.Entry.write(session=db_session, **bad_data)
     with pytest.raises(IntegrityError):
         db_session.flush()
+
 
 def test_entry_no_text_fails(db_session):
     bad_data = {'title': 'test title'}
