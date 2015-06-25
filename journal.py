@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from sqlalchemy.orm import scoped_session, sessionmaker
+from zope.sqlalchemy import ZopeTransactionExtension
 import os
 from pyramid.config import Configurator
 from pyramid.view import view_config
@@ -8,6 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
 
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 
@@ -16,9 +19,17 @@ class Entry(Base):
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     title = sa.Column(sa.Unicode(127), nullable=False)
     text = sa.Column(sa.UnicodeText, nullable=False)
-    created = sa.Column(
+    timestamp = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow
     )
+
+    @classmethod
+    def write(cls, title=None, text=None, session=None):
+        if session is None:
+            session = DBSession
+        instance = cls(title=title, text=text)
+        session.add(instance)
+        return instance
 
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
@@ -31,9 +42,9 @@ def init_db():
     Base.metadata.create_all(engine)
 
 
-@view_config(route_name='home', renderer='string')
+@view_config(route_name='home', renderer='templates/test.jinja2')
 def home(request):
-    return "Hello World"
+    return {"one": "two"}
 
 
 def main():
@@ -42,10 +53,16 @@ def main():
     debug = os.environ.get('DEBUG', True)
     settings['reload_all'] = debug
     settings['debug_all'] = debug
+
+    if not os.environ.get('TESTING', False):
+    # only bind the session if we are not testing
+        engine = sa.create_engine(DATABASE_URL)
+        DBSession.configure(bind=engine)
     # configuration setup
     config = Configurator(
         settings=settings
     )
+    config.include('pyramid_tm')
     config.add_route('home', '/')
     config.scan()
     app = config.make_wsgi_app()
