@@ -31,6 +31,12 @@ class Entry(Base):
         session.add(instance)
         return instance
 
+    @classmethod
+    def all(cls, session=None):
+        if session is None:
+            session = DBSession
+        return session.query(cls).order_by(cls.timestamp.desc()).all()
+
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
     'postgresql://karenwong@localhost:5432/learning-journal'
@@ -63,6 +69,7 @@ def main():
         settings=settings
     )
     config.include('pyramid_tm')
+    config.include('pyramid_jinja2')
     config.add_route('home', '/')
     config.scan()
     app = config.make_wsgi_app()
