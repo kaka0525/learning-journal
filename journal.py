@@ -48,7 +48,7 @@ def init_db():
     Base.metadata.create_all(engine)
 
 
-@view_config(route_name='home', renderer='templates/test.jinja2')
+@view_config(route_name='home', renderer='templates/list.jinja2')
 def home(request):
     return {"one": "two"}
 
