@@ -47,11 +47,15 @@ def init_db():
     engine = sa.create_engine(DATABASE_URL)
     Base.metadata.create_all(engine)
 
+# @view_config(route_name='home', renderer='string')
+# def home(request):
+#     return "Hello World"
+
 
 @view_config(route_name='home', renderer='templates/list.jinja2')
-def home(request):
-    return {"one": "two"}
-
+def list_view(request):
+    entries = Entry.all()
+    return {'entries': entries}
 
 def main():
     """Create a configured wsgi app"""
