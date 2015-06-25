@@ -37,6 +37,8 @@ def db_session(request, connection):
     from journal import DBSession
     return DBSession
 
+# starting here after where we stand space
+
 
 @pytest.fixture()
 def app():
@@ -57,6 +59,14 @@ def entry(db_session):
     return entry
 
 
+def test_empty_listing(app):
+    response = app.get('/')
+    assert response.status_code == 200
+    actual = response.body
+    expected = 'No entries here so far'
+    assert expected in actual
+
+
 def test_listing(app, entry):
     response = app.get('/')
     assert response.status_code == 200
@@ -64,6 +74,7 @@ def test_listing(app, entry):
     for field in ['title', 'text']:
         expected = getattr(entry, field, 'absent')
         assert expected in actual
+
 
 
 def test_write_entry(db_session):
@@ -127,9 +138,4 @@ def test_read_entries_one(db_session):
         assert isinstance(entry, journal.Entry)
 
 
-def test_empty_listing(app):
-    response = app.get('/')
-    assert response.status_code == 200
-    actual = response.body
-    expected = 'No entries here so far'
-    assert expected in actual
+
