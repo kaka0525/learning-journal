@@ -6,6 +6,7 @@ from zope.sqlalchemy import ZopeTransactionExtension
 import os
 from pyramid.config import Configurator
 from pyramid.view import view_config
+from pyramid.security import remember, forget
 from waitress import serve
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
@@ -105,9 +106,31 @@ def main():
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
     config.add_route('add', '/add')
+    config.add_route('login', '/login')
     config.scan()
     app = config.make_wsgi_app()
     return app
+
+
+@view_config(route_name='login', renderer="templates/login.jinja2")
+def login(request):
+    """authenticate a user by username/password"""
+    username = request.params.get('username', '')
+    error = ''
+    if request.method == 'POST':
+        error = "Login Failed"
+        authenticated = False
+        try:
+            authenticated = do_login(request)
+        except ValueError as e:
+            error = str(e)
+
+        if authenticated:
+            headers = remember(request, username)
+            return HTTPFound(request.route_url('home'), headers=headers)
+
+    return {'error': error, 'username': username}
+
 
 
 def do_login(request):
