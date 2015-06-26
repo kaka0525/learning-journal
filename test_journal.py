@@ -76,6 +76,7 @@ def auth_req(request):
 
     return req
 
+
 def test_listing(app, entry):
     response = app.get('/')
     assert response.status_code == 200
@@ -165,9 +166,11 @@ def test_post_to_add_view(app):
     for expected in entry_data.values():
         assert expected in actual
 
+
 def test_add_no_params(app):
     response = app.post('/add', status=500)
     assert 'IntegrityError' in response.body
+
 
 def test_do_login_success(auth_req):
     from journal import do_login
@@ -193,3 +196,40 @@ def test_do_login_missing_params(auth_req):
         auth_req.params = params
         with pytest.raises(ValueError):
             do_login(auth_req)
+
+
+INPUT_BTN = '<input type="submit" value="Share" name="Share"/>'
+
+
+def login_helper(username, password, app):
+    """encapsulate app login for reuse in tests
+
+    Accept all status codes so that we can make assertions in tests
+    """
+    login_data = {'username': username, 'password': password}
+    return app.post('/login', params=login_data, status='*')
+
+
+def test_start_as_anonymous(app):
+    response = app.get('/', status=200)
+    actual = response.body
+    assert INPUT_BTN not in actual
+
+
+def test_login_success(app):
+    username, password = ('admin', 'secret')
+    redirect = login_helper(username, password, app)
+    assert redirect.status_code == 302
+    response = redirect.follow()
+    assert response.status_code == 200
+    actual = response.body
+    assert INPUT_BTN in actual
+
+
+def test_login_fails(app):
+    username, password = ('admin', 'wrong')
+    response = login_helper(username, password, app)
+    assert response.status_code == 200
+    actual = response.body
+    assert "Login Failed" in actual
+    assert INPUT_BTN not in actual
