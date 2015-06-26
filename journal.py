@@ -37,6 +37,11 @@ class Entry(Base):
             session = DBSession
         return session.query(cls).order_by(cls.timestamp.desc()).all()
 
+    @property
+    def created(self):
+        return self.timestamp
+
+
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
     'postgresql://karenwong@localhost:5432/learning-journal'
@@ -57,6 +62,7 @@ def list_view(request):
     entries = Entry.all()
     return {'entries': entries}
 
+
 def main():
     """Create a configured wsgi app"""
     settings = {}
@@ -65,7 +71,7 @@ def main():
     settings['debug_all'] = debug
 
     if not os.environ.get('TESTING', False):
-    # only bind the session if we are not testing
+        # only bind the session if we are not testing
         engine = sa.create_engine(DATABASE_URL)
         DBSession.configure(bind=engine)
     # configuration setup
