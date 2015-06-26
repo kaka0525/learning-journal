@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from cryptacular.bcrypt import BCRYPTPasswordManager
 from sqlalchemy.orm import scoped_session, sessionmaker
 from zope.sqlalchemy import ZopeTransactionExtension
 import os
@@ -78,8 +79,13 @@ def main():
     debug = os.environ.get('DEBUG', True)
     settings['reload_all'] = debug
     settings['debug_all'] = debug
+    # settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
+    # settings['auth.password'] = os.environ.get('AUTH_PASSWORD', 'secret')
     settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
-    settings['auth.password'] = os.environ.get('AUTH_PASSWORD', 'secret')
+    manager = BCRYPTPasswordManager()
+    settings['auth.password'] = os.environ.get(
+        'AUTH_PASSWORD', manager.encode('secret')
+    )
 
     if not os.environ.get('TESTING', False):
     # only bind the session if we are not testing
