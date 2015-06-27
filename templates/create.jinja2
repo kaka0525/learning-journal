@@ -3,7 +3,7 @@
   <header>
         <nav>
             <ul>
-                <li><a href="index.html">+Home</a></li>
+                <li><a href='{{ request.route_url('home') }}'>+Home</a></li>
                 <li><a href="new_entry.html" class="selected">+New Entry</a></li>
 <!--                 show the latest entry on the detail page -->
                 <li><a href="detail.html">+View Latest Entry</a></li>
@@ -11,18 +11,15 @@
         </nav>
     </header>
 
-    <div align="center"><form id="entry_grid" action={{ request.route_url('add') }} method="post">
+    <div align="center">
+        <form id="entry_grid" class="add_entry" action="{{ request.route_url('add') }}" method="POST">
         <h2>New Journal Entry</h2>
 
         <label for="title">Title:</label>
-        <input type="text" id="title" name="title_name">
+        <input type="text" id="title" name="title">
 
-        <label for="date">Date:</label>
-        <input type="text" id="date" name="date_name">
-
-        <textarea id="text_entry" name="text_entry_name" placeholder="What did you learn today, Karen?"  cols="60" rows="8"></textarea>
+        <textarea id="text" name="text" placeholder="What did you learn today, Karen?"  cols="60" rows="8"></textarea>
         <button type="submit">+Add</button>
       </form>
   </div>
-  {% endfor %}
 {% endblock %}

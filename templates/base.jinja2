@@ -17,8 +17,8 @@
     <header>
         <nav>
             <ul>
-                <li><a href="index.html" class="selected">+Home</a></li>
-                <li><a href="new_entry.html">+New Entry</a></li>
+                <li><a href='{{ request.route_url('home') }}' class="selected">+Home</a></li>
+                <li><a href='{{ request.route_url('create') }}'>+New Entry</a></li>
 <!--                 show the latest entry on the detail page -->
                 <li><a href="detail.html">+View Latest Entry</a></li>
 
@@ -40,8 +40,8 @@
           <li><a href="/">Home</a></li>
         </ul>
       </nav>
-    <aside id="user-controls">
-        <ul>
+    <aside>
+        <ul id="user-controls">
         {% if not request.authenticated_userid %}
           <li><a href="{{ request.route_url('login') }}">log in</a></li>
         {% else %}

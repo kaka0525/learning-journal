@@ -59,6 +59,10 @@ a:hover, a.on {
     margin-top: 25px;
     text-align: center;}
 
+#user-controls {
+    list-style-type: none;
+}
+
 
 .selected {
      color: #cc3333;}
