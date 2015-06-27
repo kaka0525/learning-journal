@@ -61,6 +61,11 @@ def list_view(request):
     return {'entries': entries}
 
 
+@view_config(route_name='create', renderer='templates/create.jinja2')
+def create_view(request):
+    return {}
+
+
 @view_config(route_name='add', request_method='POST')
 def add_entry(request):
     title = request.params.get('title')
@@ -92,7 +97,7 @@ def main():
     )
 
     if not os.environ.get('TESTING', False):
-    # only bind the session if we are not testing
+        # only bind the session if we are not testing
         engine = sa.create_engine(DATABASE_URL)
         DBSession.configure(bind=engine)
     auth_secret = os.environ.get('JOURNAL_AUTH_SECRET', 'itsaseekrit')
@@ -112,6 +117,7 @@ def main():
     config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('create', '/create')
     config.scan()
     app = config.make_wsgi_app()
     return app
@@ -141,6 +147,7 @@ def login(request):
 def logout(request):
     headers = forget(request)
     return HTTPFound(request.route_url('home'), headers=headers)
+
 
 def do_login(request):
     username = request.params.get('username', None)
