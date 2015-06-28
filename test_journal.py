@@ -184,7 +184,6 @@ def test_read_entries_one(db_session):
     for entry in entries:
         assert isinstance(entry, journal.Entry)
 
-
 def test_empty_listing(app):
     response = app.get('/')
     assert response.status_code == 200
@@ -198,7 +197,7 @@ def test_post_to_add_view(app):
         'title': 'Hello there',
         'text': 'This is a post',
     }
-    response = app.post('/add', params=entry_data, status='3*')
+    response = app.post('/create', params=entry_data, status='3*')
     redirected = response.follow()
     actual = redirected.body
     for expected in entry_data.values():
@@ -206,7 +205,7 @@ def test_post_to_add_view(app):
 
 
 def test_add_no_params(app):
-    response = app.post('/add', status=500)
+    response = app.post('/create', status=500)
     assert 'IntegrityError' in response.body
 
 
