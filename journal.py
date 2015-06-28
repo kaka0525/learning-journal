@@ -68,10 +68,13 @@ def create_view(request):
 
 @view_config(route_name='add', request_method='POST')
 def add_entry(request):
-    title = request.params.get('title')
-    text = request.params.get('text')
-    Entry.write(title=title, text=text)
-    return HTTPFound(request.route_url('home'))
+    if request.authenticated_userid:
+        title = request.params.get('title')
+        text = request.params.get('text')
+        Entry.write(title=title, text=text)
+        return HTTPFound(request.route_url('home'))
+    else:
+        raise ValueError('must be logged in to create an entry')
 
 
 @view_config(context=DBAPIError)

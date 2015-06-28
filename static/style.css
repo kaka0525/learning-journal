@@ -68,31 +68,35 @@ a:hover, a.on {
      color: #cc3333;}
 
 
-#text_entry {
+/*#text_entry {
     display: block;
     margin-top: 2%;
     margin-left: auto;
     margin-right: auto;
-    font-family:  Courier, monospace;}
+    font-family:  Courier, monospace;}*/
 
-.entry {
-    display: block;
-    margin-top: 2%;
+#restriction {
+    text-align: center;
+    font-weight: bold;
+}
+
+.field, .control_row {
+    width: 10em;
     margin-left: auto;
     margin-right: auto;
     font-family:  Courier, monospace;
 }
 
 
-article {
-    display: block;
-    margin-top: 2%;
-    margin-left: auto;
-    margin-right: auto;
-    font-family:  Courier, monospace;}
+.entry {
+  width: 20em;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 button {
-    margin-top: 1%;}
+    margin-top: 1%;
+}
 
 #new-entry-button, #edit_entry-button, #delete_entry-button {
     list-style: none;
@@ -113,6 +117,7 @@ footer {
   form {
     max-width: 480px;}
 }
+
 
 
 

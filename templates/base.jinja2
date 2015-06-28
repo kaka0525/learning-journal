@@ -17,8 +17,10 @@
     <header>
         <nav>
             <ul>
-                <li><a href='{{ request.route_url('home') }}' class="selected">+Home</a></li>
-                <li><a href='{{ request.route_url('create') }}'>+New Entry</a></li>
+                <li><a href='{{ request.route_url('home') }}'
+                  class="selected">+Home</a></li>
+                <li><a href='{{ request.route_url('create') }}'>+New Entry</a>
+                </li>
 <!--                 show the latest entry on the detail page -->
                 <li><a href="detail.html">+View Latest Entry</a></li>
 
@@ -28,7 +30,8 @@
     <div id=cat>
         <img src="/static/img/cat_with_glasses.jpg" alt="cat with glasses" />
     </div>
-    <p> Hi! This is Karen. This journal captures my learning journey from being a baby programmer to a toddler programmer. #neverGiveUp</p>
+    <p> Hi! This is Karen. This journal captures my learning journey from being
+      a baby programmer to a toddler programmer. #neverGiveUp</p>
     </header>
     <main>
       <section id="content">
