@@ -39,7 +39,6 @@ def db_session(request, connection):
     from journal import DBSession
     return DBSession
 
-# starting here after where we stand space
 
 
 @pytest.fixture()

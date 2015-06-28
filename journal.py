@@ -61,20 +61,17 @@ def list_view(request):
     return {'entries': entries}
 
 
-@view_config(route_name='create', renderer='templates/create.jinja2')
-def create_view(request):
+@view_config(route_name='add', renderer='templates/add.jinja2')
+def add_view(request):
     return {}
 
 
-@view_config(route_name='add', request_method='POST')
-def add_entry(request):
-    if request.authenticated_userid:
-        title = request.params.get('title')
-        text = request.params.get('text')
-        Entry.write(title=title, text=text)
-        return HTTPFound(request.route_url('home'))
-    else:
-        raise ValueError('must be logged in to create an entry')
+@view_config(route_name='create', request_method='POST')
+def create_entry(request):
+    title = request.params.get('title')
+    text = request.params.get('text')
+    Entry.write(title=title, text=text)
+    return HTTPFound(request.route_url('home'))
 
 
 @view_config(context=DBAPIError)
@@ -100,7 +97,7 @@ def main():
     )
 
     if not os.environ.get('TESTING', False):
-        # only bind the session if we are not testing
+    # only bind the session if we are not testing
         engine = sa.create_engine(DATABASE_URL)
         DBSession.configure(bind=engine)
     auth_secret = os.environ.get('JOURNAL_AUTH_SECRET', 'itsaseekrit')
@@ -117,10 +114,10 @@ def main():
     config.include('pyramid_jinja2')
     config.add_static_view('static', os.path.join(HERE, 'static'))
     config.add_route('home', '/')
+    config.add_route('create', '/create')
     config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
-    config.add_route('create', '/create')
     config.scan()
     app = config.make_wsgi_app()
     return app
@@ -150,7 +147,6 @@ def login(request):
 def logout(request):
     headers = forget(request)
     return HTTPFound(request.route_url('home'), headers=headers)
-
 
 def do_login(request):
     username = request.params.get('username', None)
