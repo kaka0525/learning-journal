@@ -66,6 +66,12 @@ def add_view(request):
     return {}
 
 
+@view_config(route_name='detail', renderer='templates/detail.jinja2')
+def detail_view(request):
+    entries = Entry.all()
+    return {'entries': entries}
+
+
 @view_config(route_name='create', request_method='POST')
 def create_entry(request):
     title = request.params.get('title')
@@ -118,6 +124,7 @@ def main():
     config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('detail', '/detail')
     config.scan()
     app = config.make_wsgi_app()
     return app
@@ -147,6 +154,7 @@ def login(request):
 def logout(request):
     headers = forget(request)
     return HTTPFound(request.route_url('home'), headers=headers)
+
 
 def do_login(request):
     username = request.params.get('username', None)

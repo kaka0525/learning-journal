@@ -19,10 +19,9 @@
             <ul>
                 <li><a href='{{ request.route_url('home') }}'
                   class="selected">+Home</a></li>
-                <li><a href='{{ request.route_url('create') }}'>+New Entry</a>
+                <li><a href='{{ request.route_url('add') }}'>+New Entry</a>
                 </li>
-<!--                 show the latest entry on the detail page -->
-                <li><a href="detail.html">+View Latest Entry</a></li>
+                <li><a href='{{ request.route_url('detail') }}'>+View Latest Entry</a></li>
 
             </ul>
         </nav>
