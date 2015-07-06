@@ -1,34 +1,32 @@
 {% extends "base.jinja2" %}
-{% block body %}
-<!-- {% if request.authenticated_userid %}
-<aside>
-<form action="{{ request.route_url('add') }}" method="POST" class="add_entry">
-  <div class="field">
-    <label for="title">Title</label>
-    <input type="text" size="30" name="title" id="title"/>
-  </div>
-  <div class="field">
-    <label for="text">Text</label>
-    <textarea name="text_entry" id="text_entry" rows="5" cols="80"></textarea>
-  </div>
-  <div class="control_row">
-    <input type="submit" value="Share" name="Share"/>
-  </div>
-</form>
-</aside>
-{% endif %} -->
-<!-- <h2>Entries</h2> -->
-{% for entry in entries %}
-<article class="entry" id="entry={{entry.id}}">
-  <h3>{{ entry.title }}</h3>
-  <p class="dateline">{{ entry.timestamp.strftime('%b. %d, %Y') }}
-  <div class="entry_body">
-    {{ entry.text|safe }}
-  </div>
-</article>
-{% else %}
-<div class="entry">
-  <p><em>No entries here so far</em></p>
-</div>
-{% endfor %}
-{% endblock %}
+{% block section %}
+    <h2>Entries</h2>
+    {% for entry in entries %}
+      {% if not request.authenticated_userid %}
+        <article class='entry' id='entry{{entry.id}}'>
+          <h3>{{ entry.title }}</h3>
+          <p class='dateline'>{{ entry.timestamp.strftime('%b, %d, %y')}}</p>
+          <div class='entry_body'>
+            {{ entry.text | safe }}
+          </div>
+        </article>
+      {% elif request.authenticated_userid %}
+        <article class='entry' id='entry{{entry.id}}'>
+          <h3><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
+          <p class='dateline'>{{ entry.timestamp.strftime('%b, %d, %y')}}</p>
+          <div class='entry_body'>
+            {{ entry.text | safe }}
+          </div>
+        </article>
+      {% endif %}
+      {% else %}
+        <divclass='entry'>
+          <p><em>No entries here so far</em></p>
+        </div>
+    {% endfor %}
+  {% endblock %}
+
+
+
+
+
