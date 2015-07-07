@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from cryptacular.bcrypt import BCRYPTPasswordManager
@@ -15,10 +16,16 @@ from sqlalchemy.exc import DBAPIError
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 import datetime
-HERE = os.path.dirname(os.path.abspath(__file__))
+from markdown import markdown
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
+DATABASE_URL = os.environ.get(
+    'DATABASE_URL',
+    'postgresql://karenwong@localhost:5432/learning-journal'
+)
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 class Entry(Base):
@@ -30,6 +37,9 @@ class Entry(Base):
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
+    def __repr__(self):
+        return self.title
+
     @classmethod
     def write(cls, title=None, text=None, session=None):
         if session is None:
@@ -39,15 +49,23 @@ class Entry(Base):
         return instance
 
     @classmethod
+    def one(cls, eid=None, session=None):
+        if session is None:
+            session = DBSession
+        return session.query(cls).filter(cls.id == eid).one()
+
+    @classmethod
     def all(cls, session=None):
         if session is None:
             session = DBSession
         return session.query(cls).order_by(cls.timestamp.desc()).all()
 
-DATABASE_URL = os.environ.get(
-    'DATABASE_URL',
-    'postgresql://karenwong@localhost:5432/learning-journal'
-)
+    @classmethod
+    def modify(cls, eid=None, title=None, text=None):
+        instance = cls.one(eid)
+        instance.title = title
+        instance.text = text
+        return instance
 
 
 def init_db():
@@ -61,15 +79,50 @@ def list_view(request):
     return {'entries': entries}
 
 
+@view_config(route_name='detail', renderer='templates/detail.jinja2')
+def detail_view(request):
+    entry = Entry.one(request.matchdict['id'])
+    html_text = markdown(entry.text, output_format='html5')
+
+    def my_highlight(matchobj):
+        return highlight(matchobj.group(0), PythonLexer(), HtmlFormatter())
+
+    pattern = r'(?<=<code>)[\s\S]*(?=<\/code>)'
+    html_text = re.sub(pattern, my_highlight, html_text)
+    return {
+        'entry': {
+            'id': entry.id,
+            'title': entry.title,
+            'text': html_text,
+            'created': entry.created
+        }
+    }
+
+
+@view_config(route_name='edit', renderer='templates/edit.jinja2')
+def edit_view(request):
+    if request.method == 'POST':
+        eid = request.matchdict['id']
+        title = request.params.get('title')
+        text = request.params.get('text')
+        Entry.modify(eid=eid, title=title, text=text)
+        return HTTPFound(request.route_url('home'))
+
+    entry = Entry.one(request.matchdict['id'])
+    return {'entry': entry}
+
+
 @view_config(route_name='add', renderer='templates/add.jinja2')
 def add_view(request):
+    if request.method == 'POST':
+        title = request.params.get('title')
+        text = request.params.get('text')
+        Entry.write(title=title, text=text)
+        return HTTPFound(request.route_url('home'))
+
     return {}
 
 
-@view_config(route_name='detail', renderer='templates/detail.jinja2')
-def detail_view(request):
-    entries = Entry.all()
-    return {'entries': entries}
 
 
 @view_config(route_name='create', request_method='POST')
@@ -124,7 +177,9 @@ def main():
     config.add_route('add', '/add')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
-    config.add_route('detail', '/detail')
+    config.add_route('detail', '/detail/{id}')
+    config.add_route('edit', '/edit/{id}')
+    config.add_static_view('static', os.path.join(HERE, 'static'))
     config.scan()
     app = config.make_wsgi_app()
     return app

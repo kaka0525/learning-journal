@@ -4,29 +4,23 @@
     {% for entry in entries %}
       {% if not request.authenticated_userid %}
         <article class='entry' id='entry{{entry.id}}'>
-          <h3>{{ entry.title }}</h3>
+          <h3><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
           <p class='dateline'>{{ entry.timestamp.strftime('%b, %d, %y')}}</p>
           <div class='entry_body'>
-            {{ entry.text | safe }}
+            {{ entry.markd_in(entry.text) | safe }}
           </div>
-        </article>
       {% elif request.authenticated_userid %}
         <article class='entry' id='entry{{entry.id}}'>
           <h3><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
           <p class='dateline'>{{ entry.timestamp.strftime('%b, %d, %y')}}</p>
           <div class='entry_body'>
-            {{ entry.text | safe }}
+            {{ entry.markd_in(entry.text) | safe }}
           </div>
         </article>
-      {% endif %}
       {% else %}
         <divclass='entry'>
           <p><em>No entries here so far</em></p>
         </div>
+      {% endif %}
     {% endfor %}
   {% endblock %}
-
-
-
-
-
