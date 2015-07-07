@@ -11,7 +11,7 @@
     {% elif request.authenticated_userid %}
           <article class='entry' id='entry{{entry.id}}'>
             <h3>{{ entry.title }}</h3>
-            <input type=submit value='Edit Entry' id="input-forward" onclick="window.location='{{ request.route_url('edit-entry', id=entry.id) }}'">
+            <input type=submit value='Edit Entry' id="input-forward" onclick="window.location='{{ request.route_url('edit', id=entry.id) }}'">
             <input type=submit value='Delete Entry' id="del-{{ entry.id }}" onclick="window.location='{{ request.route_url('delete', id=entry.id) }}'">
             <p class='dateline'>{{ entry.timestamp.strftime('%b, %d, %y')}}</p>
             <div class='entry_body'>
