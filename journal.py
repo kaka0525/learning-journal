@@ -61,11 +61,25 @@ class Entry(Base):
         return session.query(cls).order_by(cls.timestamp.desc()).all()
 
     @classmethod
-    def modify(cls, eid=None, title=None, text=None):
+    def modify(cls, eid=None, title=None, text=None, session=None):
+        if session is None:
+            session = DBSession
         instance = cls.one(eid)
         instance.title = title
         instance.text = text
+        session.add(instance)
         return instance
+
+    @classmethod
+    def delete(cls, eid=None, session=None):
+        if session is None:
+            session = DBSession
+        instance = cls.one(eid)
+        session.delete(instance)
+        return instance
+
+    def markd_in(self, text):
+        return markdown(text, extensions=['codehilite', 'fenced_code'])
 
 
 def init_db():
@@ -82,34 +96,7 @@ def list_view(request):
 @view_config(route_name='detail', renderer='templates/detail.jinja2')
 def detail_view(request):
     entry = Entry.one(request.matchdict['id'])
-    html_text = markdown(entry.text, output_format='html5')
-
-    def my_highlight(matchobj):
-        return highlight(matchobj.group(0), PythonLexer(), HtmlFormatter())
-
-    pattern = r'(?<=<code>)[\s\S]*(?=<\/code>)'
-    html_text = re.sub(pattern, my_highlight, html_text)
-    return {
-        'entry': {
-            'id': entry.id,
-            'title': entry.title,
-            'text': html_text,
-            'created': entry.created
-        }
-    }
-
-
-@view_config(route_name='edit', renderer='templates/edit.jinja2')
-def edit_view(request):
-    if request.method == 'POST':
-        eid = request.matchdict['id']
-        title = request.params.get('title')
-        text = request.params.get('text')
-        Entry.modify(eid=eid, title=title, text=text)
-        return HTTPFound(request.route_url('home'))
-
-    entry = Entry.one(request.matchdict['id'])
-    return {'entry': entry}
+    return {"entry: entry"}
 
 
 @view_config(route_name='add', renderer='templates/add.jinja2')
@@ -119,10 +106,22 @@ def add_view(request):
         text = request.params.get('text')
         Entry.write(title=title, text=text)
         return HTTPFound(request.route_url('home'))
-
     return {}
 
 
+@view_config(route_name='edit', renderer='templates/edit.jinja2')
+def edit_view(request):
+    entry = Entry.one(request.matchdict['id'])
+    return {'entry': entry}
+
+
+@view_config(route_name='modify', request_method='POST')
+def modify_entry(request):
+    eid = request.matchdict['id']
+    title = request.params.get('title')
+    text = request.params.get('text')
+    Entry.modify(eid=eid, title=title, text=text)
+    return HTTPFound(request.route_url('home'))
 
 
 @view_config(route_name='create', request_method='POST')
@@ -156,7 +155,6 @@ def main():
     )
 
     if not os.environ.get('TESTING', False):
-    # only bind the session if we are not testing
         engine = sa.create_engine(DATABASE_URL)
         DBSession.configure(bind=engine)
     auth_secret = os.environ.get('JOURNAL_AUTH_SECRET', 'itsaseekrit')
@@ -179,7 +177,9 @@ def main():
     config.add_route('logout', '/logout')
     config.add_route('detail', '/detail/{id}')
     config.add_route('edit', '/edit/{id}')
-    config.add_static_view('static', os.path.join(HERE, 'static'))
+    config.add_route('modify', '/modify/{id}')
+    config.add_route('delete', '/delete')
+    # config.add_static_view('static', os.path.join(HERE, 'static'))
     config.scan()
     app = config.make_wsgi_app()
     return app
