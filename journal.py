@@ -96,7 +96,7 @@ def list_view(request):
 @view_config(route_name='detail', renderer='templates/detail.jinja2')
 def detail_view(request):
     entry = Entry.one(request.matchdict['id'])
-    return {"entry: entry"}
+    return {'entry': entry}
 
 
 @view_config(route_name='add', renderer='templates/add.jinja2')
@@ -109,7 +109,7 @@ def add_view(request):
     return {}
 
 
-@view_config(route_name='edit', renderer='templates/edit.jinja2')
+@view_config(route_name='edit', renderer='templates/edit-entry.jinja2')
 def edit_view(request):
     entry = Entry.one(request.matchdict['id'])
     return {'entry': entry}
@@ -129,6 +129,13 @@ def create_entry(request):
     title = request.params.get('title')
     text = request.params.get('text')
     Entry.write(title=title, text=text)
+    return HTTPFound(request.route_url('home'))
+
+
+@view_config(route_name='delete', request_method='POST')
+def delete_entry(request):
+    eid = request.matchdict['id']
+    Entry.delete(eid=eid)
     return HTTPFound(request.route_url('home'))
 
 
@@ -178,7 +185,7 @@ def main():
     config.add_route('detail', '/detail/{id}')
     config.add_route('edit', '/edit/{id}')
     config.add_route('modify', '/modify/{id}')
-    config.add_route('delete', '/delete')
+    config.add_route('delete', '/delete/{id}')
     # config.add_static_view('static', os.path.join(HERE, 'static'))
     config.scan()
     app = config.make_wsgi_app()
