@@ -153,8 +153,6 @@ def main():
     debug = os.environ.get('DEBUG', True)
     settings['reload_all'] = debug
     settings['debug_all'] = debug
-    # settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
-    # settings['auth.password'] = os.environ.get('AUTH_PASSWORD', 'secret')
     settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
     manager = BCRYPTPasswordManager()
     settings['auth.password'] = os.environ.get(

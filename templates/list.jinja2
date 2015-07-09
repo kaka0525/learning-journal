@@ -1,6 +1,5 @@
 {% extends "base.jinja2" %}
 {% block section %}
-    <h2>Entries</h2>
     {% for entry in entries %}
       <article class='entry' id='entry{{entry.id}}'>
         <h3><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
