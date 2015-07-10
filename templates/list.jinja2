@@ -8,5 +8,9 @@
           {{ entry.markd_in(entry.text) | safe }}
         </div>
       </article>
+      {% else %}
+        <div class= 'entry_body'>
+          <p><em>No entries here so far </em></p>
+        </div>
     {% endfor %}
   {% endblock %}

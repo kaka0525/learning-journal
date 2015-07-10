@@ -40,7 +40,6 @@ def db_session(request, connection):
     return DBSession
 
 
-
 @pytest.fixture()
 def app():
     from journal import main
@@ -75,7 +74,6 @@ def test_listing(app, entry):
     for field in ['title', 'text']:
         expected = getattr(entry, field, 'absent')
         assert expected in actual
-
 
 
 @pytest.fixture()
@@ -184,6 +182,7 @@ def test_read_entries_one(db_session):
     for entry in entries:
         assert isinstance(entry, journal.Entry)
 
+
 def test_empty_listing(app):
     response = app.get('/')
     assert response.status_code == 200
@@ -280,4 +279,3 @@ def test_logout(app):
     assert response.status_code == 200
     actual = response.body
     assert INPUT_BTN not in actual
-
