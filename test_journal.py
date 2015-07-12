@@ -19,6 +19,7 @@ os.environ['TESTING'] = "True"
 INPUT_BTN = '<input type="submit" value="Share" name="Share"/>'
 New_Entry_BTN = '<li id = new_entry>'
 
+
 @pytest.fixture(scope='session')
 def connection(request):
     engine = create_engine(TEST_DATABASE_URL)  # create database
