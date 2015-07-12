@@ -295,7 +295,8 @@ def test_markdown_entry(db_session, app):
 
 
 def test_editing(db_session, app):
-    instance = journal.Entry.write(session=db_session, text=u'original test', title='title')
+    instance = journal.Entry.write(session=db_session, text=u'original test',
+                                   title='title')
     db_session.flush()
     journal.Entry.modify(session=db_session, text=u'edited text',
                          title='title', eid=instance.id)
@@ -306,15 +307,11 @@ def test_editing(db_session, app):
     assert expected in actual
 
 
-
-# def test_permalink_exists(db_session, app):
-#     """ <form action="{{ request.route_url('edit', id=entry.id) }}">
-#               <input type=submit value='Edit Entry' id='input-forward'>
-#             </form>"""
-#     entry = {'text': 'testing 123', 'title': "Title"}
-#     journal.Entry.write(session=db_session, **entry)
-#     db_session.flush()
-#     response = app.get('/Title')
-#     actual = response.body
-#     expected = 'testing 123'
-#     assert expected in actual
+def test_permalink(db_session, app):
+    entry_data = {'text': 'testing 123', 'title': "Test"}
+    journal.Entry.write(session=db_session, **entry_data)
+    db_session.flush()
+    response = app.get('/')
+    actual = response.body
+    expected = 'testing 123'
+    assert expected in actual
