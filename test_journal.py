@@ -279,3 +279,42 @@ def test_logout(app):
     assert response.status_code == 200
     actual = response.body
     assert INPUT_BTN not in actual
+
+
+def test_markdown_entry(db_session, app):
+    entry = {'text': '#testing 123\n*italic*```print "Testing 123"'
+             '```', 'title': "Title"}
+    journal.Entry.write(session=db_session, **entry)
+    db_session.flush()
+    response = app.get('/')
+    actual = response.body
+    expected = '<h1>testing 123</h1>'
+    italic = '<em>italic</em>'
+    assert expected in actual
+    assert italic in actual
+
+
+def test_editing(db_session, app):
+    instance = journal.Entry.write(session=db_session, text=u'original test', title='title')
+    db_session.flush()
+    journal.Entry.modify(session=db_session, text=u'edited text',
+                         title='title', eid=instance.id)
+    db_session.flush()
+    response = app.get('/')
+    actual = response.body
+    expected = u"edited text"
+    assert expected in actual
+
+
+
+# def test_permalink_exists(db_session, app):
+#     """ <form action="{{ request.route_url('edit', id=entry.id) }}">
+#               <input type=submit value='Edit Entry' id='input-forward'>
+#             </form>"""
+#     entry = {'text': 'testing 123', 'title': "Title"}
+#     journal.Entry.write(session=db_session, **entry)
+#     db_session.flush()
+#     response = app.get('/Title')
+#     actual = response.body
+#     expected = 'testing 123'
+#     assert expected in actual
