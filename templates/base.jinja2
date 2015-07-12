@@ -21,7 +21,7 @@
               {% else %}
                 <li><a href='{{ request.route_url('home') }}'
                   class="selected">+Home</a></li>
-                <li><a href='{{ request.route_url('add') }}'>+New Entry</a>
+                <li id = new_entry><a href='{{ request.route_url('add') }}'>+New Entry</a>
                 </li>
 
               {% endif %}

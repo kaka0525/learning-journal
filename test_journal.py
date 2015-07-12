@@ -2,10 +2,12 @@
 from __future__ import unicode_literals
 import os
 import pytest
+import journal
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
 from pyramid import testing
 from cryptacular.bcrypt import BCRYPTPasswordManager
+
 
 TEST_DATABASE_URL = os.environ.get(
     'DATABASE_URL',
@@ -14,8 +16,8 @@ TEST_DATABASE_URL = os.environ.get(
 os.environ['DATABASE_URL'] = TEST_DATABASE_URL
 os.environ['TESTING'] = "True"
 
-import journal
-
+INPUT_BTN = '<input type="submit" value="Share" name="Share"/>'
+New_Entry_BTN = '<li id = new_entry>'
 
 @pytest.fixture(scope='session')
 def connection(request):
@@ -234,9 +236,6 @@ def test_do_login_missing_params(auth_req):
             do_login(auth_req)
 
 
-INPUT_BTN = '<input type="submit" value="Share" name="Share"/>'
-
-
 def login_helper(username, password, app):
     """encapsulate app login for reuse in tests
 
@@ -259,7 +258,7 @@ def test_login_success(app):
     response = redirect.follow()
     assert response.status_code == 200
     actual = response.body
-    assert INPUT_BTN in actual
+    assert New_Entry_BTN in actual
 
 
 def test_login_fails(app):
