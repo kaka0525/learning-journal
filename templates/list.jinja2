@@ -13,4 +13,28 @@
           <p><em>No entries here so far </em></p>
         </div>
     {% endfor %}
+ <article class="hide-on-start journal-entry">
+    <h2 class="title" id="entry-title"></h2>
+    <div id="entry-text">
+    </div>
+
+    <span class="date"></span>
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="" data-text="" data-via="Karensywong" data-size="large" data-count="none">Tweet Entry</a>
+        {% if request.authenticated_userid %}
+        <button class="button-forward" id="edit-button">
+            Edit Entry
+        </button>
+        {% endif %}
+    </div>
+</article>
+
+
+    <div class="hide-on-start" id= "edit-form-container">
+    <form id="edit-form">
+        <h2>Edit Entry</h2>
+        <input id="in-title" type="hidden" name="title" placeholder="Title" type="text">
+        <textarea id="in-text" name="text" placeholder="Entry Text"></textarea>
+        <input id="submit-new" type="submit" value="Submit" name="Submit"/>
+    </form>
+
   {% endblock %}
