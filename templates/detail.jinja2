@@ -23,4 +23,12 @@
             </div>
           </article>
     {% endif %}
+  <div class="hide-on-start" id= "edit-form-container">
+    <form id="edit-form" action="{{ request.route_url('modify', id=entry.id) }}" method="POST">
+        <h2>Edit Entry</h2>
+        <input id="in-title" type="hidden" name="title" placeholder="Title" type="text" value="{{ entry.title }}">
+        <textarea id="in-text" name="text" placeholder="Entry Text">{{ entry.text }}</textarea>
+        <input id="submit-new" type="submit" value="Submit" name="Submit"/>
+    </form>
+  <div>
   {% endblock %}
