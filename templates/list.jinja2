@@ -2,24 +2,25 @@
 {% block section %}
 
 <div align="center" id="ajax-new-entry" class="hide-on-start">
-    <form id="entry_grid" class="add_entry" action="{{ request.route_url('create') }}"
+    <form id="ajax-new-entry-form" class="add_entry" action="{{ request.route_url('create') }}"
     method="POST">
         <h2>New Journal Entry</h2>
 
         <label for="title">Title:</label>
-        <input type="text" id="title" name="title"required/>
+        <input type="text" id="ajax-title" name="title"required/>
 
         <textarea
-            id="text"
+            id="ajax-text"
             name="text"
             placeholder="What did you learn today, Karen?"
             cols="60"
             rows="8"></textarea>
         <!-- <button type="submit">+Add</button> -->
-        <input id="submit-new" type="submit" value="Submit" name="Submit"/>
+        <input id="submit-new-ajax" type="submit" value="Submit" name="Submit"/>
     </form>
 </div>
 
+<div id="entry-list">
 {% for entry in entries %}
   <article class='entry' id='entry{{entry.id}}'>
     <h3><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
@@ -38,10 +39,11 @@
     </div>
   </article>
 {% else %}
-    <div class= 'entry_body'>
+    <div class='entry_body' id='no-entries'>
       <p><em>No entries here so far </em></p>
     </div>
 {% endfor %}
+</div>
 
 
  <article class="hide-on-start journal-entry">

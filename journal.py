@@ -17,8 +17,10 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 import datetime
 from markdown import markdown
+import transaction
 
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension(),
+                                        expire_on_commit=False))
 Base = declarative_base()
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
@@ -124,12 +126,18 @@ def modify_entry(request):
     return HTTPFound(request.route_url('home'))
 
 
-@view_config(route_name='create', request_method='POST')
+@view_config(route_name='create', request_method='POST',
+             xhr=True, renderer='templates/list-entry.jinja2')
+@view_config(route_name='create', request_method='POST', xhr=False)
 def create_entry(request):
     title = request.params.get('title')
     text = request.params.get('text')
-    Entry.write(title=title, text=text)
-    return HTTPFound(request.route_url('home'))
+    entry = Entry.write(title=title, text=text)
+    if 'HTTP_X_REQUESTED_WITH' in request.environ:
+        transaction.commit()
+        return {'entry': entry}
+    else:
+        return HTTPFound(request.route_url('home'))
 
 
 @view_config(route_name='delete', request_method='POST')

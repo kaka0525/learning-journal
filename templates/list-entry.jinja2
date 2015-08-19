@@ -1,0 +1,16 @@
+<article class='entry' id='entry{{entry.id}}'>
+    <h3><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
+    <a href="https://twitter.com/share"
+            class="twitter-share-button"
+            data-url="{{ request.route_url('detail', id=entry.id) }}"
+            data-text="{{ entry.title }}"
+            data-via="Karensywong"
+            data-size="large"
+            data-count="none">
+        Tweet Entry
+    </a>
+    <p class='dateline'>{{ entry.timestamp.strftime('%b, %d, %y')}}</p>
+    <div class='entry_body'>
+      {{ entry.markd_in(entry.text) | safe }}
+    </div>
+</article>
