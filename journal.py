@@ -117,13 +117,26 @@ def edit_view(request):
     return {'entry': entry}
 
 
-@view_config(route_name='modify', request_method='POST')
+@view_config(route_name='modify', request_method='POST', xhr=True,
+             renderer='json')
+@view_config(route_name='modify', request_method='POST', xhr=False)
 def modify_entry(request):
     eid = request.matchdict['id']
     title = request.params.get('title')
     text = request.params.get('text')
-    Entry.modify(eid=eid, title=title, text=text)
-    return HTTPFound(request.route_url('home'))
+    entry = Entry.modify(eid=eid, title=title, text=text)
+    if 'HTTP_X_REQUESTED_WITH' in request.environ:
+        transaction.commit()
+        return {
+            'entry': {
+                'id': entry.id,
+                'title': entry.title,
+                'text': entry.text,
+                'markdown': entry.markd_in(entry.text)
+            }
+        }
+    else:
+        return HTTPFound(request.route_url('home'))
 
 
 @view_config(route_name='create', request_method='POST',

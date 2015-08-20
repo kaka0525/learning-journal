@@ -23,20 +23,69 @@
 <div id="entry-list">
 {% for entry in entries %}
   <article class='entry' id='entry{{entry.id}}'>
-    <h3><a href="{{ request.route_url('detail', id=entry.id) }}">{{ entry.title }}</a></h3>
-    <a href="https://twitter.com/share"
-            class="twitter-share-button"
-            data-url="{{ request.route_url('detail', id=entry.id) }}"
-            data-text="{{ entry.title }}"
-            data-via="Karensywong"
-            data-size="large"
-            data-count="none">
-        Tweet Entry
-    </a>
-    <p class='dateline'>{{ entry.timestamp.strftime('%b, %d, %y')}}</p>
-    <div class='entry_body'>
-      {{ entry.markd_in(entry.text) | safe }}
+    <!-- What is shown to display -->
+    <div class='entry-display' id='entry-display-{{ entry.id }}'>
+        <h3>
+            <a href="{{ request.route_url('detail', id=entry.id) }}"
+                    id="header-link-{{ entry.id }}">
+                {{ entry.title }}
+            </a>
+        </h3>
+        {% if request.authenticated_userid %}
+            <input id="edit-button-{{ entry.id }}"
+                    data-id="{{ entry.id }}"
+                    class="entry-edit-ajax"
+                    type="submit"
+                    value="edit"
+                    name="Edit" />
+        {% endif %}
+        <a href="https://twitter.com/share"
+                class="twitter-share-button"
+                data-url="{{ request.route_url('detail', id=entry.id) }}"
+                data-text="{{ entry.title }}"
+                data-via="Karensywong"
+                data-size="large"
+                data-count="none">
+            Tweet Entry
+        </a>
+        <p class='dateline'>{{ entry.timestamp.strftime('%b, %d, %y')}}</p>
+        <div class='entry_body' id="entry-body-{{ entry.id }}">
+          {{ entry.markd_in(entry.text) | safe }}
+        </div>
     </div>
+
+
+    {% if request.authenticated_userid %}
+    <!-- What is shown to edit -->
+    <div class='entry-edit hide-on-start' id='entry-edit-{{ entry.id }}'>
+        <form id="edit-form-{{ entry.id }}"
+                action="{{ request.route_url('modify', id=entry.id) }}"
+                method="POST">
+            <h3>Edit Entry</h3>
+            <input id="title-edit-{{ entry.id }}"
+                    name="title"
+                    placeholder="Title"
+                    type="text"
+                    value="{{ entry.title }}">
+            <textarea
+                    id="text-edit-{{ entry.id }}"
+                    name="text"
+                    placeholder="Entry Text">{{ entry.text }}</textarea>
+            <input id="submit-cancel-{{ entry.id }}"
+                    class="submit-cancel"
+                    data-id="{{ entry.id }}"
+                    type="submit"
+                    value="Cancel"
+                    name="Cancel"/>
+            <input id="submit-button-{{ entry.id }}"
+                    class="submit-button"
+                    data-id="{{ entry.id }}"
+                    type="submit"
+                    value="Submit"
+                    name="Submit"/>
+        </form>
+    </div>
+    {% endif %}
   </article>
 {% else %}
     <div class='entry_body' id='no-entries'>
@@ -45,23 +94,6 @@
 {% endfor %}
 </div>
 
-
- <article class="hide-on-start journal-entry">
-    <h2 class="title" id="entry-title"></h2>
-    <div id="entry-text">
-    </div>
-
-    <span class="date"></span>
-        <a href="https://twitter.com/share" class="twitter-share-button" data-url="" data-text="" data-via="Karensywong" data-size="large" data-count="none">Tweet Entry</a>
-        {% if request.authenticated_userid %}
-        <button class="button-forward" id="edit-button">
-            Edit Entry
-        </button>
-        {% endif %}
-    </div>
-</article>
-
-
 <div class="hide-on-start" id= "edit-form-container">
 <form id="edit-form">
     <h2>Edit Entry</h2>
@@ -69,5 +101,6 @@
     <textarea id="in-text" name="text" placeholder="Entry Text"></textarea>
     <input id="submit-new" type="submit" value="Submit" name="Submit"/>
 </form>
+</div>
 
 {% endblock %}
