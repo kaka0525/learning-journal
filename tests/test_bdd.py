@@ -81,11 +81,12 @@ def test_entry(db_session):
 
 
 @then('the new entry is formatted with markdown')
-def test_markdown(db_session, app):
+def test_new_entry_markdown(db_session, app):
     response = app.get('/')
     actual = response.body
     expected = '<h1>testing 123</h1>'
     italic = '<em>italic</em>'
+    print actual
     assert expected in actual
     assert italic in actual
 
